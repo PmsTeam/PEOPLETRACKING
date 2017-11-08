@@ -27,7 +27,7 @@ public:
     int intNumOfConsecutiveFramesWithoutAMatch;
 
     cv::Point predictedNextPosition;
-    
+
     // function prototypes ////////////////////////////////////////////////////////////////////////
     Blob(std::vector<cv::Point> _contour);
     void predictNextPosition(void);
@@ -35,5 +35,4 @@ public:
 };
 
 #endif    // MY_BLOB
-
 
