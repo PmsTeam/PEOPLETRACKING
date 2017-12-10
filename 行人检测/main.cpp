@@ -31,23 +31,26 @@ void drawBlobInfoOnImage(std::vector<Blob> &blobs, cv::Mat &imgFrame2Copy);
 void drawCarCountOnImage(int &carCount, cv::Mat &imgFrame2Copy);
 bool Aspectratio1(Blob frameL);
 bool Aspectratio2(Blob frameL);
-
+bool checkIfBlobsCrossedTheLine2(std::vector<Blob> &blobs, int &intHorizontalLinePosition2, int &peopleCount);
+void drawPeopleCountOnImage(int &peopleCount, cv::Mat &imgFrame2Copy);
 //main()函数从这里开始/////////////////////////////////////////////////////////////////////////////////////////////////
 int main(void) {
+	//cv::VideoCapture cap;
+	cv::VideoCapture capVideo;
 
-    cv::VideoCapture capVideo;
+	cv::Mat imgFrame1;
+	cv::Mat imgFrame2;
 
-    cv::Mat imgFrame1;
-    cv::Mat imgFrame2;
+	std::vector<Blob> blobs;
 
-    std::vector<Blob> blobs;
-
-    cv::Point crossingLine[2];
+	cv::Point crossingLine[2];
 	cv::Point crossingLine2[2];
 
-    int carCount = 0;
+	int carCount = 0;
+	int peopleCount = 0;
 
-    capVideo.open("3.avi");
+	//capVideo = cap;
+	capVideo.open("2.avi");
 
 	// 如果打开视频失败
 	if (!capVideo.isOpened()) {
@@ -68,33 +71,32 @@ int main(void) {
 	}
 
 	//同captuer >> imgFrame 将视频帧读出
-    capVideo.read(imgFrame1);
-    capVideo.read(imgFrame2);
-	
+	capVideo.read(imgFrame1);
+	capVideo.read(imgFrame2);
+
 	//划线函数，用于流量统计用/////////////////////////////////////////
-    int intHorizontalLinePosition = (int)std::round((double)imgFrame1.rows * 0.35);
+	int intHorizontalLinePosition = (int)std::round((double)imgFrame1.rows * 0.529);         //车
+	crossingLine[0].x = imgFrame1.cols * 0.085;
+	crossingLine[0].y = imgFrame1.rows * 0.529;
+	crossingLine[1].x = imgFrame1.cols * 0.386;
+	crossingLine[1].y = imgFrame1.rows * 0.529;
 
-	crossingLine[0].x = 1;
-	crossingLine[0].y = imgFrame1.rows / 2 ;
-	crossingLine[1].x = imgFrame1.cols / 2 - 55;
-	crossingLine[1].y = (imgFrame1.rows / 16) * 5;
-
-
-	crossingLine2[1].y = imgFrame1.rows*0.355;
-	crossingLine2[1].x = imgFrame1.cols*0.771;
-	crossingLine2[0].y = imgFrame1.rows*0.312;
-	crossingLine2[0].x = imgFrame1.cols*0.654;
+	int intHorizontalLinePosition2 = (int)std::round((double)imgFrame1.rows * 0.296);    //人
+	crossingLine2[1].x = imgFrame1.cols * 0.320;
+	crossingLine2[1].y = imgFrame1.rows * 0.296;
+	crossingLine2[0].x = imgFrame1.cols;
+	crossingLine2[0].y = imgFrame1.rows * 0.296;
 	///////////////////////////////////////////////////////////////////
 
-    char chCheckForEscKey = 0;
+	char chCheckForEscKey = 0;
 
-    bool blnFirstFrame = true;
+	bool blnFirstFrame = true;
 
-    int frameCount = 2;
+	int frameCount = 2;
 
-    while (capVideo.isOpened() && chCheckForEscKey != 27) {     //capVideo.isOpende()判断视频读取或者摄像头调用是否成功，成功则返回true。
+	while (capVideo.isOpened() && chCheckForEscKey != 27) {     //capVideo.isOpende()判断视频读取或者摄像头调用是否成功，成功则返回true。
 
-        std::vector<Blob> currentFrameBlobs;
+		std::vector<Blob> currentFrameBlobs;
 
 		//创建原始数据的副本
 		cv::Mat imgFrame1Copy = imgFrame1.clone();
@@ -134,56 +136,58 @@ int main(void) {
 		//克隆图像
 		cv::Mat imgThreshCopy = imgThresh.clone();
 
-        std::vector<std::vector<cv::Point> > contours;
+		std::vector<std::vector<cv::Point> > contours;
 
 		//函数cvFindContours从二值图像中检索轮廓，并返回检测到的轮廓的个数。
 		//https://baike.baidu.com/item/cvFindContours/9560509?fr=aladdin
 		//CV_RETR_EXTERNAL：只检索最外面的轮廓；CV_CHAIN_APPROX_SIMPLE：压缩水平的、垂直的和斜的部分，也就是，函数只保留他们的终点部分。
 		cv::findContours(imgThreshCopy, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
 
-		 //显示轮廓
-        //drawAndShowContours(imgThresh.size(), contours, "imgContours");
+		//显示轮廓
+		//drawAndShowContours(imgThresh.size(), contours, "imgContours");
 
-        std::vector<std::vector<cv::Point> > convexHulls(contours.size());
+		std::vector<std::vector<cv::Point> > convexHulls(contours.size());
 
-        for (unsigned int i = 0; i < contours.size(); i++) {
-            cv::convexHull(contours[i], convexHulls[i]);         //寻找凸包
-        }
+		for (unsigned int i = 0; i < contours.size(); i++) {
+			cv::convexHull(contours[i], convexHulls[i]);         //寻找凸包
+		}
 
-       // drawAndShowContours(imgThresh.size(), convexHulls, "imgConvexHulls");
+		// drawAndShowContours(imgThresh.size(), convexHulls, "imgConvexHulls");
 
-        for (auto &convexHull : convexHulls) {
-            Blob possibleBlob(convexHull);
+		for (auto &convexHull : convexHulls) {
+			Blob possibleBlob(convexHull);
 
-			if (Aspectratio1(possibleBlob)) {
+			if (Aspectratio2(possibleBlob) || Aspectratio1(possibleBlob)) {
 				currentFrameBlobs.push_back(possibleBlob);
 			}
-        }
+		}
 
-       // drawAndShowContours(imgThresh.size(), currentFrameBlobs, "imgCurrentFrameBlobs");
+		// drawAndShowContours(imgThresh.size(), currentFrameBlobs, "imgCurrentFrameBlobs");
 
-        if (blnFirstFrame == true) {
-            for (auto &currentFrameBlob : currentFrameBlobs) {
-                blobs.push_back(currentFrameBlob);
-            }
-        } else {
-            matchCurrentFrameBlobsToExistingBlobs(blobs, currentFrameBlobs);
-        }
+		if (blnFirstFrame == true) {
+			for (auto &currentFrameBlob : currentFrameBlobs) {
+				blobs.push_back(currentFrameBlob);
+			}
+		}
+		else {
+			matchCurrentFrameBlobsToExistingBlobs(blobs, currentFrameBlobs);
+		}
 
-       // drawAndShowContours(imgThresh.size(), blobs, "imgBlobs");
+		// drawAndShowContours(imgThresh.size(), blobs, "imgBlobs");
 
-        imgFrame2Copy = imgFrame2.clone();          //在上面的处理中，我们改变了之前的帧2拷贝，得到另一个框架2
+		imgFrame2Copy = imgFrame2.clone();          //在上面的处理中，我们改变了之前的帧2拷贝，得到另一个框架2
 
-        drawBlobInfoOnImage(blobs, imgFrame2Copy);
+		drawBlobInfoOnImage(blobs, imgFrame2Copy);
 
-        bool blnAtLeastOneBlobCrossedTheLine = checkIfBlobsCrossedTheLine(blobs, intHorizontalLinePosition, carCount);
+		bool blnAtLeastOneBlobCrossedTheLine = checkIfBlobsCrossedTheLine2(blobs, intHorizontalLinePosition2, peopleCount);
+		if (blnAtLeastOneBlobCrossedTheLine == true) {
+			cv::line(imgFrame2Copy, crossingLine[0], crossingLine[1], SCALAR_BLACK, 2);
+		}
+		else {
+			cv::line(imgFrame2Copy, crossingLine[0], crossingLine[1], SCALAR_RED, 2);
+		}
 
-        if (blnAtLeastOneBlobCrossedTheLine == true) {
-            cv::line(imgFrame2Copy, crossingLine[0], crossingLine[1], SCALAR_BLACK, 2);
-        } else {
-            cv::line(imgFrame2Copy, crossingLine[0], crossingLine[1], SCALAR_RED, 2);
-        }
-
+		blnAtLeastOneBlobCrossedTheLine = checkIfBlobsCrossedTheLine(blobs, intHorizontalLinePosition, carCount);
 		if (blnAtLeastOneBlobCrossedTheLine == true) {
 			cv::line(imgFrame2Copy, crossingLine2[0], crossingLine2[1], SCALAR_GREEN, 2);
 		}
@@ -191,25 +195,26 @@ int main(void) {
 			cv::line(imgFrame2Copy, crossingLine2[0], crossingLine2[1], SCALAR_RED, 2);
 		}
 
-        drawCarCountOnImage(carCount, imgFrame2Copy);
+		drawCarCountOnImage(carCount, imgFrame2Copy);
+		drawPeopleCountOnImage(peopleCount, imgFrame2Copy);
+		cv::imshow("imgFrame2Copy", imgFrame2Copy);
 
-        cv::imshow("imgFrame2Copy", imgFrame2Copy);
+		currentFrameBlobs.clear();
 
-        currentFrameBlobs.clear();
+		imgFrame1 = imgFrame2.clone();           //将第1帧移动到第2帧的位置
 
-        imgFrame1 = imgFrame2.clone();           //将第1帧移动到第2帧的位置
+		if ((capVideo.get(CV_CAP_PROP_POS_FRAMES) + 1) < capVideo.get(CV_CAP_PROP_FRAME_COUNT)) {
+			capVideo.read(imgFrame2);
+		}
+		else {
+			std::cout << "end of video\n";
+			break;
+		}
 
-        if ((capVideo.get(CV_CAP_PROP_POS_FRAMES) + 1) < capVideo.get(CV_CAP_PROP_FRAME_COUNT)) {
-            capVideo.read(imgFrame2);
-        } else {
-            std::cout << "end of video\n";
-            break;
-        }
-
-        blnFirstFrame = false;
-        frameCount++;
-        chCheckForEscKey = cv::waitKey(1);
-    }
+		blnFirstFrame = false;
+		frameCount++;
+		chCheckForEscKey = cv::waitKey(1);
+	}
 
 	if (chCheckForEscKey != 27) {               //如果用户没有按下esc(即视频的结束)
 		cv::waitKey(0);                         //让结束信息显示在窗口上
@@ -221,180 +226,220 @@ int main(void) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void matchCurrentFrameBlobsToExistingBlobs(std::vector<Blob> &existingBlobs, std::vector<Blob> &currentFrameBlobs) {
 
-    for (auto &existingBlob : existingBlobs) {
+	for (auto &existingBlob : existingBlobs) {
 
-        existingBlob.blnCurrentMatchFoundOrNewBlob = false;
+		existingBlob.blnCurrentMatchFoundOrNewBlob = false;
 
-        existingBlob.predictNextPosition();
-    }
+		existingBlob.predictNextPosition();
+	}
 
-    for (auto &currentFrameBlob : currentFrameBlobs) {
+	for (auto &currentFrameBlob : currentFrameBlobs) {
 
-        int intIndexOfLeastDistance = 0;
-        double dblLeastDistance = 100000.0;
+		int intIndexOfLeastDistance = 0;
+		double dblLeastDistance = 100000.0;
 
-        for (unsigned int i = 0; i < existingBlobs.size(); i++) {
+		for (unsigned int i = 0; i < existingBlobs.size(); i++) {
 
-            if (existingBlobs[i].blnStillBeingTracked == true) {
+			if (existingBlobs[i].blnStillBeingTracked == true) {
 
-                double dblDistance = distanceBetweenPoints(currentFrameBlob.centerPositions.back(), existingBlobs[i].predictedNextPosition);
+				double dblDistance = distanceBetweenPoints(currentFrameBlob.centerPositions.back(), existingBlobs[i].predictedNextPosition);
 
-                if (dblDistance < dblLeastDistance) {
-                    dblLeastDistance = dblDistance;
-                    intIndexOfLeastDistance = i;
-                }
-            }
-        }
+				if (dblDistance < dblLeastDistance) {
+					dblLeastDistance = dblDistance;
+					intIndexOfLeastDistance = i;
+				}
+			}
+		}
 
-        if (dblLeastDistance < currentFrameBlob.dblCurrentDiagonalSize * 0.5) {
-            addBlobToExistingBlobs(currentFrameBlob, existingBlobs, intIndexOfLeastDistance);
-        }
-        else {
-            addNewBlob(currentFrameBlob, existingBlobs);
-        }
+		if (dblLeastDistance < currentFrameBlob.dblCurrentDiagonalSize * 0.5) {
+			addBlobToExistingBlobs(currentFrameBlob, existingBlobs, intIndexOfLeastDistance);
+		}
+		else {
+			addNewBlob(currentFrameBlob, existingBlobs);
+		}
 
-    }
+	}
 
-    for (auto &existingBlob : existingBlobs) {
+	for (auto &existingBlob : existingBlobs) {
 
-        if (existingBlob.blnCurrentMatchFoundOrNewBlob == false) {
-            existingBlob.intNumOfConsecutiveFramesWithoutAMatch++;
-        }
+		if (existingBlob.blnCurrentMatchFoundOrNewBlob == false) {
+			existingBlob.intNumOfConsecutiveFramesWithoutAMatch++;
+		}
 
-        if (existingBlob.intNumOfConsecutiveFramesWithoutAMatch >= 5) {
-            existingBlob.blnStillBeingTracked = false;
-        }
+		if (existingBlob.intNumOfConsecutiveFramesWithoutAMatch >= 5) {
+			existingBlob.blnStillBeingTracked = false;
+		}
 
-    }
+	}
 
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void addBlobToExistingBlobs(Blob &currentFrameBlob, std::vector<Blob> &existingBlobs, int &intIndex) {
 
-    existingBlobs[intIndex].currentContour = currentFrameBlob.currentContour;
-    existingBlobs[intIndex].currentBoundingRect = currentFrameBlob.currentBoundingRect;
+	existingBlobs[intIndex].currentContour = currentFrameBlob.currentContour;
+	existingBlobs[intIndex].currentBoundingRect = currentFrameBlob.currentBoundingRect;
 
-    existingBlobs[intIndex].centerPositions.push_back(currentFrameBlob.centerPositions.back());
+	existingBlobs[intIndex].centerPositions.push_back(currentFrameBlob.centerPositions.back());
 
-    existingBlobs[intIndex].dblCurrentDiagonalSize = currentFrameBlob.dblCurrentDiagonalSize;
-    existingBlobs[intIndex].dblCurrentAspectRatio = currentFrameBlob.dblCurrentAspectRatio;
+	existingBlobs[intIndex].dblCurrentDiagonalSize = currentFrameBlob.dblCurrentDiagonalSize;
+	existingBlobs[intIndex].dblCurrentAspectRatio = currentFrameBlob.dblCurrentAspectRatio;
 
-    existingBlobs[intIndex].blnStillBeingTracked = true;
-    existingBlobs[intIndex].blnCurrentMatchFoundOrNewBlob = true;
+	existingBlobs[intIndex].blnStillBeingTracked = true;
+	existingBlobs[intIndex].blnCurrentMatchFoundOrNewBlob = true;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void addNewBlob(Blob &currentFrameBlob, std::vector<Blob> &existingBlobs) {
 
-    currentFrameBlob.blnCurrentMatchFoundOrNewBlob = true;
+	currentFrameBlob.blnCurrentMatchFoundOrNewBlob = true;
 
-    existingBlobs.push_back(currentFrameBlob);
+	existingBlobs.push_back(currentFrameBlob);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 double distanceBetweenPoints(cv::Point point1, cv::Point point2) {
 
-    int intX = abs(point1.x - point2.x);
-    int intY = abs(point1.y - point2.y);
+	int intX = abs(point1.x - point2.x);
+	int intY = abs(point1.y - point2.y);
 
-    return(sqrt(pow(intX, 2) + pow(intY, 2)));
+	return(sqrt(pow(intX, 2) + pow(intY, 2)));
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void drawAndShowContours(cv::Size imageSize, std::vector<std::vector<cv::Point> > contours, std::string strImageName) {
-    cv::Mat image(imageSize, CV_8UC3, SCALAR_BLACK);
+	cv::Mat image(imageSize, CV_8UC3, SCALAR_BLACK);
 
-    cv::drawContours(image, contours, -1, SCALAR_WHITE, -1);
+	cv::drawContours(image, contours, -1, SCALAR_WHITE, -1);
 
-    cv::imshow(strImageName, image);
+	cv::imshow(strImageName, image);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void drawAndShowContours(cv::Size imageSize, std::vector<Blob> blobs, std::string strImageName) {
 
-    cv::Mat image(imageSize, CV_8UC3, SCALAR_BLACK);
+	cv::Mat image(imageSize, CV_8UC3, SCALAR_BLACK);
 
-    std::vector<std::vector<cv::Point> > contours;
+	std::vector<std::vector<cv::Point> > contours;
 
-    for (auto &blob : blobs) {
-        if (blob.blnStillBeingTracked == true) {
-            contours.push_back(blob.currentContour);
-        }
-    }
+	for (auto &blob : blobs) {
+		if (blob.blnStillBeingTracked == true) {
+			contours.push_back(blob.currentContour);
+		}
+	}
 
-    cv::drawContours(image, contours, -1, SCALAR_WHITE, -1);
+	cv::drawContours(image, contours, -1, SCALAR_WHITE, -1);
 
-    cv::imshow(strImageName, image);
+	cv::imshow(strImageName, image);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 bool checkIfBlobsCrossedTheLine(std::vector<Blob> &blobs, int &intHorizontalLinePosition, int &carCount) {
-    bool blnAtLeastOneBlobCrossedTheLine = false;
+	bool blnAtLeastOneBlobCrossedTheLine = false;
 
-    for (auto blob : blobs) {
+	for (auto blob : blobs) {
 
-        if (blob.blnStillBeingTracked == true && blob.centerPositions.size() >= 2) {
-            int prevFrameIndex = (int)blob.centerPositions.size() - 2;
-            int currFrameIndex = (int)blob.centerPositions.size() - 1;
+		if (blob.blnStillBeingTracked == true && blob.centerPositions.size() >= 2) {
+			int prevFrameIndex = (int)blob.centerPositions.size() - 2;
+			int currFrameIndex = (int)blob.centerPositions.size() - 1;
 
-            if (blob.centerPositions[prevFrameIndex].y > intHorizontalLinePosition && blob.centerPositions[currFrameIndex].y <= intHorizontalLinePosition) {
-                carCount++;
-                blnAtLeastOneBlobCrossedTheLine = true;
-            }
-        }
+			if (blob.centerPositions[prevFrameIndex].y > intHorizontalLinePosition && blob.centerPositions[currFrameIndex].y <= intHorizontalLinePosition) {
+				carCount++;
+				blnAtLeastOneBlobCrossedTheLine = true;
+			}
+		}
 
-    }
+	}
 
-    return blnAtLeastOneBlobCrossedTheLine;
+	return blnAtLeastOneBlobCrossedTheLine;
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+bool checkIfBlobsCrossedTheLine2(std::vector<Blob> &blobs, int &intHorizontalLinePosition, int &peopleCount) {
+	bool blnAtLeastOneBlobCrossedTheLine = false;
+
+	for (auto blob : blobs) {
+
+		if (blob.blnStillBeingTracked == true && blob.centerPositions.size() >= 2) {
+			int prevFrameIndex = (int)blob.centerPositions.size() - 2;
+			int currFrameIndex = (int)blob.centerPositions.size() - 1;
+
+			if (blob.centerPositions[prevFrameIndex].y > intHorizontalLinePosition && blob.centerPositions[currFrameIndex].y <= intHorizontalLinePosition) {
+				peopleCount++;
+				blnAtLeastOneBlobCrossedTheLine = true;
+			}
+		}
+
+	}
+
+	return blnAtLeastOneBlobCrossedTheLine;
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void drawBlobInfoOnImage(std::vector<Blob> &blobs, cv::Mat &imgFrame2Copy) {
 
-    for (unsigned int i = 0; i < blobs.size(); i++) {
+	for (unsigned int i = 0; i < blobs.size(); i++) {
 
-        if (blobs[i].blnStillBeingTracked == true) {
-            cv::rectangle(imgFrame2Copy, blobs[i].currentBoundingRect, SCALAR_RED, 2);
+		if (blobs[i].blnStillBeingTracked == true) {
+			cv::rectangle(imgFrame2Copy, blobs[i].currentBoundingRect, SCALAR_RED, 2);
 
-            int intFontFace = CV_FONT_HERSHEY_SIMPLEX;
-            double dblFontScale = blobs[i].dblCurrentDiagonalSize / 60.0;
-            int intFontThickness = (int)std::round(dblFontScale * 1.0);
+			int intFontFace = CV_FONT_HERSHEY_SIMPLEX;
+			double dblFontScale = blobs[i].dblCurrentDiagonalSize / 60.0;
+			int intFontThickness = (int)std::round(dblFontScale * 1.0);
 
-            cv::putText(imgFrame2Copy, std::to_string(i), blobs[i].centerPositions.back(), intFontFace, dblFontScale, SCALAR_GREEN, intFontThickness);
-        }
-    }
+			cv::putText(imgFrame2Copy, std::to_string(i), blobs[i].centerPositions.back(), intFontFace, dblFontScale, SCALAR_GREEN, intFontThickness);
+		}
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void drawCarCountOnImage(int &carCount, cv::Mat &imgFrame2Copy) {
 
-    int intFontFace = CV_FONT_HERSHEY_SIMPLEX;
-    double dblFontScale = (imgFrame2Copy.rows * imgFrame2Copy.cols) / 300000.0;
-    int intFontThickness = (int)std::round(dblFontScale * 1.5);
+	int intFontFace = CV_FONT_HERSHEY_SIMPLEX;
+	double dblFontScale = (imgFrame2Copy.rows * imgFrame2Copy.cols) / 300000.0;
+	int intFontThickness = (int)std::round(dblFontScale * 1.5);
 
-    cv::Size textSize = cv::getTextSize(std::to_string(carCount), intFontFace, dblFontScale, intFontThickness, 0);
+	cv::Size textSize = cv::getTextSize(std::to_string(carCount), intFontFace, dblFontScale, intFontThickness, 0);
 
-    cv::Point ptTextBottomLeftPosition;
+	cv::Point ptTextBottomLeftPosition;
 
-    ptTextBottomLeftPosition.x = imgFrame2Copy.cols - 1 - (int)((double)textSize.width * 1.25);
-    ptTextBottomLeftPosition.y = (int)((double)textSize.height * 1.25);
+	ptTextBottomLeftPosition.x = imgFrame2Copy.cols - 1 - (int)((double)textSize.width * 1.25);
+	ptTextBottomLeftPosition.y = (int)((double)textSize.height * 1.25);
 
-    cv::putText(imgFrame2Copy, std::to_string(carCount), ptTextBottomLeftPosition, intFontFace, dblFontScale, SCALAR_BLACK, intFontThickness);
+	cv::putText(imgFrame2Copy, std::to_string(carCount), ptTextBottomLeftPosition, intFontFace, dblFontScale, SCALAR_WHITE, intFontThickness);
+
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+void drawPeopleCountOnImage(int &peopleCount, cv::Mat &imgFrame2Copy) {
+
+	int intFontFace = CV_FONT_HERSHEY_SIMPLEX;
+	double dblFontScale = (imgFrame2Copy.rows * imgFrame2Copy.cols) / 300000.0;
+	int intFontThickness = (int)std::round(dblFontScale * 1.5);
+
+	cv::Size textSize = cv::getTextSize(std::to_string(peopleCount), intFontFace, dblFontScale, intFontThickness, 0);
+
+	cv::Point ptTextBottomLeftPosition;
+
+	ptTextBottomLeftPosition.x = (int)((double)textSize.width * 1.25);
+	ptTextBottomLeftPosition.y = (int)((double)textSize.height * 1.25);
+
+	cv::putText(imgFrame2Copy, std::to_string(peopleCount), ptTextBottomLeftPosition, intFontFace, dblFontScale, SCALAR_WHITE, intFontThickness);
 
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool Aspectratio1(Blob possibleBlob)
 {
-	if (possibleBlob.currentBoundingRect.area() > 1500 &&
+	if (possibleBlob.currentBoundingRect.area() > 2100 &&
 		//长宽比
-		possibleBlob.dblCurrentAspectRatio > 1.0 && possibleBlob.dblCurrentAspectRatio < 3.0 &&
+		possibleBlob.dblCurrentAspectRatio > 1.25 && possibleBlob.dblCurrentAspectRatio < 2.5 &&
 		//边界矩形的宽、高
-		possibleBlob.currentBoundingRect.width > 40 &&
-		possibleBlob.currentBoundingRect.height > 25 &&
+		possibleBlob.currentBoundingRect.width > 60 &&
+		possibleBlob.currentBoundingRect.height > 30 &&
 		//对角线长度
-		possibleBlob.dblCurrentDiagonalSize > 40 &&
+		possibleBlob.dblCurrentDiagonalSize > 60 &&
 		//contourArea用于计算面积
 		(cv::contourArea(possibleBlob.currentContour) / (double)possibleBlob.currentBoundingRect.area()) > 0.50)
 		return true;
@@ -405,14 +450,14 @@ bool Aspectratio1(Blob possibleBlob)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 bool Aspectratio2(Blob possibleBlob)
 {
-	if (possibleBlob.currentBoundingRect.area() > 500 &&
+	if (possibleBlob.currentBoundingRect.area() > 800 &&
 		//长宽比
-		possibleBlob.dblCurrentAspectRatio > 0.1 && possibleBlob.dblCurrentAspectRatio < 0.9 &&
+		possibleBlob.dblCurrentAspectRatio > 0.35 && possibleBlob.dblCurrentAspectRatio < 0.80 &&
 		//边界矩形的宽、高
-		possibleBlob.currentBoundingRect.width > 10 &&
-		possibleBlob.currentBoundingRect.height > 30 &&
+		possibleBlob.currentBoundingRect.width > 20 &&
+		possibleBlob.currentBoundingRect.height > 35 &&
 		//对角线长度
-		possibleBlob.dblCurrentDiagonalSize > 30 &&
+		possibleBlob.dblCurrentDiagonalSize > 35 &&
 		//contourArea用于计算面积
 		(cv::contourArea(possibleBlob.currentContour) / (double)possibleBlob.currentBoundingRect.area()) > 0.50)
 		return true;

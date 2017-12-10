@@ -36,3 +36,4 @@ public:
 
 #endif    // MY_BLOB
 
+#pragma once
