@@ -1,4 +1,6 @@
 //头文件以及命名空间//////////////////////////////////////////////////////////////
+#include<string.h>
+#include<string>
 #include<opencv2/core/core.hpp>
 #include<opencv2/highgui/highgui.hpp>
 #include<opencv2/imgproc/imgproc.hpp>
@@ -34,7 +36,8 @@ bool Aspectratio2(Blob frameL);
 bool checkIfBlobsCrossedTheLine2(std::vector<Blob> &blobs, int &intHorizontalLinePosition2, int &peopleCount);
 void drawPeopleCountOnImage(int &peopleCount, cv::Mat &imgFrame2Copy);
 //main()函数从这里开始/////////////////////////////////////////////////////////////////////////////////////////////////
-int main(void) {
+
+int main() {
 	//cv::VideoCapture cap;
 	cv::VideoCapture capVideo;
 
