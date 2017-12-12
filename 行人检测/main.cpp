@@ -53,7 +53,7 @@ int main() {
 	int peopleCount = 0;
 
 	//capVideo = cap;
-	capVideo.open("2.avi");
+	capVideo.open(".//2.avi"); 
 
 	// 如果打开视频失败
 	if (!capVideo.isOpened()) {
@@ -96,6 +96,13 @@ int main() {
 	bool blnFirstFrame = true;
 
 	int frameCount = 2;
+
+	cv::VideoWriter vw;
+	vw.open(".//output.avi", // 输出视频文件名
+		(int)capVideo.get(CV_FOURCC_PROMPT), // 也可设为CV_FOURCC_PROMPT，在运行时选取
+		(double)capVideo.get(CV_CAP_PROP_FPS), // 视频帧率
+		cv::Size((int)capVideo.get(CV_CAP_PROP_FRAME_WIDTH), (int)capVideo.get(CV_CAP_PROP_FRAME_HEIGHT)), // 视频大小
+		true); // 是否输出彩色视频
 
 	while (capVideo.isOpened() && chCheckForEscKey != 27) {     //capVideo.isOpende()判断视频读取或者摄像头调用是否成功，成功则返回true。
 
@@ -201,6 +208,7 @@ int main() {
 		drawCarCountOnImage(carCount, imgFrame2Copy);
 		drawPeopleCountOnImage(peopleCount, imgFrame2Copy);
 		cv::imshow("imgFrame2Copy", imgFrame2Copy);
+		vw << imgFrame2Copy;
 
 		currentFrameBlobs.clear();
 
