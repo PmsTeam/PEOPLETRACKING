@@ -35,6 +35,9 @@ void DDetectionTracking(const string sourcePath, const string outputPath)
 		Size((int)capVideo.get(CV_CAP_PROP_FRAME_WIDTH),
 		(int)capVideo.get(CV_CAP_PROP_FRAME_HEIGHT)), // 视频大小
 		true); // 是否输出彩色视频
+	ofstream oFile;//输出csv专用
+	oFile.open("./cache//Car-People.csv", ios::out | ios::trunc);
+	oFile << "当前视频时间" << "," << "累计通过车辆总数" << "," << "1s内通过车辆总数" << "," << "累计通过行人总数" << "," << "1s内通过行人总数" << endl;
 
 	Mat imgFrame1;
 	Mat imgFrame2;
@@ -83,6 +86,17 @@ void DDetectionTracking(const string sourcePath, const string outputPath)
 		if (out++ == 30)
 		{
 			peopleDCount = peopleCount - peopleDCount;
+			carDCount = carCount - carDCount;
+
+			string currentTime = to_string(capVideo.get(CV_CAP_PROP_POS_MSEC) / 1000);
+			string subCurrentTime = currentTime.substr(0, currentTime.size() - 5) + "秒";
+			string avgSpeed;
+			if (carDCount != 0)
+				avgSpeed = to_string(accSpeed / carDCount);
+			else
+				avgSpeed = to_string(0);
+			string subAvgSpeed = avgSpeed.substr(0, avgSpeed.size() - 5) + "km/h";
+			oFile << subCurrentTime << "," << carCount << "," << carDCount << "," << peopleCount << "," << peopleCount << endl;
 
 			outfile << "TOTAL-PEOPLE：";
 			outfile << peopleCount;
@@ -94,7 +108,7 @@ void DDetectionTracking(const string sourcePath, const string outputPath)
 			outfile << peopleDCount << endl;
 			peopleDCount = peopleCount;
 
-			carDCount = carCount - carDCount;
+			
 			outfile << "TOTAL-CAR：";
 			outfile << carCount;
 			outfile << "    ";
@@ -157,7 +171,7 @@ void DDetectionTracking(const string sourcePath, const string outputPath)
 		findContours(imgThreshCopy, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
 
 		//显示轮廓
-		//drawAndShowContours(imgThresh.size(), contours, "imgContours");
+		drawAndShowContours(imgThresh.size(), contours, "imgContours");
 
 		vector<vector<Point> > convexHulls(contours.size());
 
@@ -165,7 +179,7 @@ void DDetectionTracking(const string sourcePath, const string outputPath)
 			cv::convexHull(contours[i], convexHulls[i]);         //寻找凸包
 		}
 
-		// drawAndShowContours(imgThresh.size(), convexHulls, "imgConvexHulls");
+		drawAndShowContours(imgThresh.size(), convexHulls, "imgConvexHulls");
 		vector<Blob> currentFrameBlobs;
 
 		for (auto &convexHull : convexHulls) {
@@ -176,7 +190,7 @@ void DDetectionTracking(const string sourcePath, const string outputPath)
 				currentFrameBlobs.push_back(possibleBlob);
 			}
 
-		// drawAndShowContours(imgThresh.size(), currentFrameBlobs, "imgCurrentFrameBlobs");
+		drawAndShowContours(imgThresh.size(), currentFrameBlobs, "imgCurrentFrameBlobs");
 
 		if (blnFirstFrame == true)
 			for (auto &currentFrameBlob : currentFrameBlobs)
@@ -184,7 +198,7 @@ void DDetectionTracking(const string sourcePath, const string outputPath)
 		else
 			matchCurrentFrameBlobsToExistingBlobs(blobs, currentFrameBlobs);
 
-		// drawAndShowContours(imgThresh.size(), blobs, "imgBlobs");
+		drawAndShowContours(imgThresh.size(), blobs, "imgBlobs");
 
 		imgFrame2Copy = imgFrame2.clone();          //在上面的处理中，我们改变了之前的帧2拷贝，得到另一个框架2
 

@@ -2,21 +2,21 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //extern vector<double> frameTime;
-Blob::Blob(vector<Point> _contour) 
+Blob::Blob(vector<Point> _contour)
 {
 	currentContour = _contour;
-    currentBoundingRect = boundingRect(currentContour);
- 
+	currentBoundingRect = boundingRect(currentContour);
+
 	Point currentCenter;
-    currentCenter.x = (currentBoundingRect.x + currentBoundingRect.x + currentBoundingRect.width) / 2;
-    currentCenter.y = (currentBoundingRect.y + currentBoundingRect.y + currentBoundingRect.height) / 2;
-    centerPositions.push_back(currentCenter);
+	currentCenter.x = (currentBoundingRect.x + currentBoundingRect.x + currentBoundingRect.width) / 2;
+	currentCenter.y = (currentBoundingRect.y + currentBoundingRect.y + currentBoundingRect.height) / 2;
+	centerPositions.push_back(currentCenter);
 
-    dblCurrentDiagonalSize = sqrt(pow(currentBoundingRect.width, 2) + pow(currentBoundingRect.height, 2));
-    dblCurrentAspectRatio = (float)currentBoundingRect.width / (float)currentBoundingRect.height;
+	dblCurrentDiagonalSize = sqrt(pow(currentBoundingRect.width, 2) + pow(currentBoundingRect.height, 2));
+	dblCurrentAspectRatio = (float)currentBoundingRect.width / (float)currentBoundingRect.height;
 
-    blnStillBeingTracked = true;
-    blnCurrentMatchFoundOrNewBlob = true;
+	blnStillBeingTracked = true;
+	blnCurrentMatchFoundOrNewBlob = true;
 	blnIsVehicle = false;
 	blnIsPeople = false;
 
@@ -24,13 +24,13 @@ Blob::Blob(vector<Point> _contour)
 	dblCarSpeed = 0;
 	//currentTime.push_back(frameTime.back());
 
-    intNumOfConsecutiveFramesWithoutAMatch = 0;
+	intNumOfConsecutiveFramesWithoutAMatch = 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-void Blob::predictNextPosition(void) 
+void Blob::predictNextPosition(void)
 {
-    int numPositions = (int)centerPositions.size();
+	int numPositions = (int)centerPositions.size();
 
 	if (numPositions == 1)
 	{
@@ -106,17 +106,17 @@ void Blob::judgeVehicle(Blob &possibleBlob)
 		possibleBlob.currentBoundingRect.height > 30 &&
 		possibleBlob.dblCurrentDiagonalSize > 60.0 &&
 		(contourArea(possibleBlob.currentContour) / (double)possibleBlob.currentBoundingRect.area()) > 0.50)
-		possibleBlob.blnIsVehicle = true;	
+		possibleBlob.blnIsVehicle = true;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void Blob::judgePeople(Blob &possibleBlob)
 {
-	if (possibleBlob.currentBoundingRect.area() > 1100 &&
-		possibleBlob.dblCurrentAspectRatio > 0.15 && possibleBlob.dblCurrentAspectRatio < 0.75 &&
-		possibleBlob.currentBoundingRect.width > 30 &&
-		possibleBlob.currentBoundingRect.height > 60 &&
-		possibleBlob.dblCurrentDiagonalSize > 60 &&
+	if (possibleBlob.currentBoundingRect.area() > 800 &&
+		possibleBlob.dblCurrentAspectRatio > 0.35 && possibleBlob.dblCurrentAspectRatio < 0.80 &&
+		possibleBlob.currentBoundingRect.width > 20 &&
+		possibleBlob.currentBoundingRect.height > 35 &&
+		possibleBlob.dblCurrentDiagonalSize > 35 &&
 		(contourArea(possibleBlob.currentContour) / (double)possibleBlob.currentBoundingRect.area()) > 0.30)
 		possibleBlob.blnIsPeople = true;
 }
@@ -153,8 +153,7 @@ void Blob::DjudgePeople(Blob &possibleBlob)
 void Blob::evaluateSpeed()
 {
 	int i = centerPositions.size();//质心数量
-	//int j = currentTime.size();//时间戳数量
-	if (blnStillBeingTracked == true && i >= 2 /*&& j >= 2*/)
+	if (blnStillBeingTracked == true && i >= 2)
 	{
 		//获得位移量
 		//double dx = centerPositions[i - 1].x - centerPositions[i - 2].x;
@@ -168,7 +167,9 @@ void Blob::evaluateSpeed()
 		double y2 = centerPositions[i - 2].y;
 		double dy = y1 - y2;
 
-		double ds = sqrt(dx*dx + dy*dy) * 350.00 * ((720 - y1) / 720) * ((720 - y1) / 720);
+		//double ds = sqrt(dx*dx + dy*dy) * 350.00 * ((720 - y1) / 720) * ((720 - y1) / 720);//./CarsDrivingUnderBridge.mp4
+																						   double ds = sqrt(dx*dx + dy*dy) * 69.40;//./DSC_0068.mp4
+
 		double dt = 33.3667;
 		dblCarSpeed = ds / dt;
 	}

@@ -62,6 +62,6 @@ int main(int argc, char* argv[])
 	//peopleDetectionTracking(vediopath2);
 	//Detector peopleDetector(videoPath2);
 	//carDetector.detectingPeople();
-	system("pause");
+	//system("pause");
     return 0;
 }

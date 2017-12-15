@@ -37,11 +37,11 @@ void peopleDetectionTracking(const string videoPath,const string outputPath)
 
 	//定义计数横线位置
 	Point crossingLine[2];
-	int intHorizontalLinePosition = (int)round((double)imgFrame1.rows * 0.35);
-	crossingLine[0].x = imgFrame1.cols * 0.276;
-	crossingLine[0].y = imgFrame1.rows * 0.556;
-	crossingLine[1].x = imgFrame1.cols * 0.674;
-	crossingLine[1].y = imgFrame1.rows * 0.556;
+	int intHorizontalLinePosition = (int)round((double)imgFrame1.rows * 0.534);
+	crossingLine[0].x = imgFrame1.cols * 0.405;
+	crossingLine[0].y = imgFrame1.rows * 0.534;
+	crossingLine[1].x = imgFrame1.cols * 0.980;
+	crossingLine[1].y = imgFrame1.rows * 0.534;
 
 	char chCheckForEscKey = 0;
 	bool blnFirstFrame = true;
@@ -57,8 +57,8 @@ void peopleDetectionTracking(const string videoPath,const string outputPath)
 	ofstream oFile;
 
 	//打开要输出的文件 
-	oFile.open("./cache/行人信息摘要.csv", ios::out | ios::trunc);    // 这样就很容易的输出一个需要的excel 文件
-	oFile << "当前视频时间" << "," << "累计通过行人总数" << "," << "1s内通过行人总数" << "," << "行人通过平均速率" << endl;
+	oFile.open("./cache/Digest-People.csv", ios::out | ios::trunc);    // 这样就很容易的输出一个需要的excel 文件
+	oFile << "当前视频时间" << "," << "累计通过行人总数" << "," << "1s内通过行人总数"  << endl;
 	
 	while (capVideo.isOpened() && chCheckForEscKey != 27)
 	{
@@ -90,7 +90,7 @@ void peopleDetectionTracking(const string videoPath,const string outputPath)
 			outfile << "REAL-PEOPLE: ";
 			outfile << peopleDCount << endl;
 			//结合当前时间，写出到流量报告
-			oFile << subCurrentTime << "," << peopleCount << "," << peopleDCount << "," << subAvgSpeed << endl;
+			oFile << subCurrentTime << "," << peopleCount << "," << peopleDCount  << endl;
 			peopleDCount = peopleCount;
 			accSpeed = 0;
 			out = 0;
@@ -133,7 +133,7 @@ void peopleDetectionTracking(const string videoPath,const string outputPath)
 		//寻找并绘制轮廓，每个轮廓存储为一个点向量
 		vector<vector<Point> > contours;
 		findContours(imgThreshCopy, contours, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
-		//drawAndShowContours(imgThresh.size(), contours, "imgContours");
+		drawAndShowContours(imgThresh.size(), contours, "imgContours");
 
 		//寻找并绘制凸包
 		vector<vector<Point> > convexHulls(contours.size());
@@ -142,7 +142,7 @@ void peopleDetectionTracking(const string videoPath,const string outputPath)
 
 		vector<Blob> currentFrameBlobs; //当前帧中的团块
 
-		//drawAndShowContours(imgThresh.size(), convexHulls, "imgConvexHulls");
+		drawAndShowContours(imgThresh.size(), convexHulls, "imgConvexHulls");
 		//判断团块是否为行人
 		for (auto &convexHull : convexHulls)
 		{
@@ -151,7 +151,7 @@ void peopleDetectionTracking(const string videoPath,const string outputPath)
 			if (possibleBlob.blnIsPeople)
 				currentFrameBlobs.push_back(possibleBlob);
 		}
-		//drawAndShowContours(imgThresh.size(), currentFrameBlobs, "imgCurrentFrameBlobs");
+		drawAndShowContours(imgThresh.size(), currentFrameBlobs, "imgCurrentFrameBlobs");
 
 		//将当前行人团块放入总车辆团块集合
 		if (blnFirstFrame == true)
@@ -159,7 +159,7 @@ void peopleDetectionTracking(const string videoPath,const string outputPath)
 				blobs.push_back(currentFrameBlob);
 		else
 			matchCurrentFrameBlobsToExistingBlobs(blobs, currentFrameBlobs);
-		//drawAndShowContours(imgThresh.size(), blobs, "imgBlobs");
+		drawAndShowContours(imgThresh.size(), blobs, "imgBlobs");
 
 		// get another copy of frame 2 since we changed the previous frame 2 copy in the processing above
 		imgFrame2Copy = imgFrame2.clone();

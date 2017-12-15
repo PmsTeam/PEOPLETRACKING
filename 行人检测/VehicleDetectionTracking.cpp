@@ -1,5 +1,7 @@
 #include "VehicleDetectionTracking.h"
 
+//Mat imgCar;
+//vector<double> frameTime;//视频帧当前时间
 extern double accSpeed;
 
 void vehicleDetectionTracking(const string sourcePath, const string outputPath)
@@ -33,7 +35,7 @@ void vehicleDetectionTracking(const string sourcePath, const string outputPath)
 	ofstream outfile("./cache/out-car.txt");//缓存给后台调用
 
 											//打开要输出的文件 
-	oFile.open("./cache/车辆信息摘要.csv", ios::out | ios::trunc);
+	oFile.open("./cache//Digest-Car.csv", ios::out | ios::trunc);
 	oFile << "当前视频时间" << "," << "累计通过车辆总数" << "," << "1s内通过车辆总数" << "," << "车辆通过平均速率" << endl;
 
 	//读取连续的两帧
@@ -61,10 +63,6 @@ void vehicleDetectionTracking(const string sourcePath, const string outputPath)
 	int out = 0;
 	while (capVideo.isOpened() && chCheckForEscKey != 27)
 	{
-		//获取当前帧的距离视频开始的时间位置（ms）
-		//frameTime.push_back(capVideo.get(CV_CAP_PROP_POS_MSEC));
-
-		//每30帧输出一次这段时间内通过的车数
 		if (out++ == 30)
 		{
 			carDCount = carCount - carDCount;
@@ -79,7 +77,6 @@ void vehicleDetectionTracking(const string sourcePath, const string outputPath)
 
 			//结合当前时间，写出到流量报告
 			oFile << subCurrentTime << "," << carCount << "," << carDCount << "," << subAvgSpeed << endl;
-
 			outfile << "REAL-TIME：";
 			outfile << subCurrentTime;
 			outfile << "    ";
@@ -171,7 +168,7 @@ void vehicleDetectionTracking(const string sourcePath, const string outputPath)
 		drawBlobInfoOnImage(blobs, imgFrame2Copy);
 
 		//判断车辆是否越过横线
-		bool blnAtLeastOneBlobCrossedTheLine = checkIfBlobsCrossedTheLine3(blobs, intHorizontalLinePosition, carCount);
+		bool blnAtLeastOneBlobCrossedTheLine = checkIfBlobsCrossedTheLine(blobs, intHorizontalLinePosition, carCount);
 		if (blnAtLeastOneBlobCrossedTheLine == true)
 			line(imgFrame2Copy, crossingLine[0], crossingLine[1], SCALAR_GREEN, 2);
 		else

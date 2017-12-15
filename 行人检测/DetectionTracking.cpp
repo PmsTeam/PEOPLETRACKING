@@ -89,7 +89,7 @@ void drawAndShowContours(Size imageSize, vector<vector<Point> > contours, string
 
 	drawContours(image, contours, -1, SCALAR_WHITE, -1);
 
-	imshow(strImageName, image);
+	//imshow(strImageName, image);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -107,7 +107,7 @@ void drawAndShowContours(Size imageSize, vector<Blob> blobs, string strImageName
 
 	drawContours(image, contours, -1, SCALAR_WHITE, -1);
 
-	imshow(strImageName, image);
+	//imshow(strImageName, image);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -203,7 +203,7 @@ void drawBlobInfoOnImage(vector<Blob> &blobs, Mat &imgFrame2Copy)
 			//putText(imgFrame2Copy, to_string(i), blobs[i].centerPositions.back(), intFontFace, dblFontScale, SCALAR_GREEN, intFontThickness);
 
 			string strSpeed = to_string(blobs[i].dblCarSpeed);
-			string subString = strSpeed.substr(0, strSpeed.size() - 5);
+			string subString = strSpeed.substr(0, strSpeed.size() - 5) + "km/h";
 			putText(imgFrame2Copy, subString, blobs[i].centerPositions.back(), intFontFace, dblFontScale, SCALAR_GREEN, intFontThickness);
 		}
 	}
