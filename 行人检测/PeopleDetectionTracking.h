@@ -3,6 +3,7 @@
 #define __PEOPLEDETECTIONTRACKING_H_
 #include <opencv2\opencv.hpp>
 #include <iostream>
+#include<fstream>
 #include "Blob.h"
 #include "DetectionTracking.h"
 using namespace cv;

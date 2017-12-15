@@ -1,6 +1,5 @@
 #include "VehicleDetectionTracking.h"
 
-//Mat imgCar;
 vector<double> frameTime;//视频帧当前时间
 
 void vehicleDetectionTracking(const string sourcePath, const string outputPath)
@@ -55,7 +54,7 @@ void vehicleDetectionTracking(const string sourcePath, const string outputPath)
 	vector<Blob> blobs;
 
 	int out = 0;//每30帧输出一次这段时间内通过的车数
-	ofstream outfile("./cache/outtest.txt");
+	ofstream outfile("./cache/out-car.txt");
 	while (capVideo.isOpened() && chCheckForEscKey != 27)
 	{
 		//获取当前帧的距离视频开始的时间位置（ms）
@@ -90,7 +89,7 @@ void vehicleDetectionTracking(const string sourcePath, const string outputPath)
 		
 		//获得二值化图像
 		threshold(imgDifference, imgThresh, 30, 255.0, CV_THRESH_BINARY);
-		imshow("imgThresh", imgThresh);
+		//imshow("imgThresh", imgThresh);
 
 		//获取常用的结构元素的形状
 		Mat structuringElement3x3 = getStructuringElement(MORPH_RECT, Size(3, 3));
@@ -111,13 +110,13 @@ void vehicleDetectionTracking(const string sourcePath, const string outputPath)
 		//寻找并绘制轮廓，每个轮廓存储为一个点向量
 		vector<vector<Point> > contours;
 		findContours(imgThreshCopy, contours, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
-		drawAndShowContours(imgThresh.size(), contours, "imgContours");
+		//drawAndShowContours(imgThresh.size(), contours, "imgContours");
 
 		//寻找并绘制凸包
 		vector<vector<Point> > convexHulls(contours.size());
 		for (unsigned int i = 0; i < contours.size(); i++)
 			convexHull(contours[i], convexHulls[i]);
-		drawAndShowContours(imgThresh.size(), convexHulls, "imgConvexHulls");
+		//drawAndShowContours(imgThresh.size(), convexHulls, "imgConvexHulls");
 
 		vector<Blob> currentFrameBlobs;//当前帧中的团块
 
@@ -129,7 +128,7 @@ void vehicleDetectionTracking(const string sourcePath, const string outputPath)
 			if (possibleBlob.blnIsVehicle)
 				currentFrameBlobs.push_back(possibleBlob);
 		}
-		drawAndShowContours(imgThresh.size(), currentFrameBlobs, "imgCurrentFrameBlobs");
+		//drawAndShowContours(imgThresh.size(), currentFrameBlobs, "imgCurrentFrameBlobs");
 
 		//将当前车辆团块放入总车辆团块集合
 		if (blnFirstFrame == true)
@@ -137,7 +136,7 @@ void vehicleDetectionTracking(const string sourcePath, const string outputPath)
 				blobs.push_back(currentFrameBlob);
 		else
 			matchCurrentFrameBlobsToExistingBlobs(blobs, currentFrameBlobs);
-		drawAndShowContours(imgThresh.size(), blobs, "imgBlobs");
+		//drawAndShowContours(imgThresh.size(), blobs, "imgBlobs");
 
 		// get another copy of frame 2 since we changed the previous frame 2 copy in the processing above
 		imgFrame2Copy = imgFrame2.clone();
@@ -151,8 +150,6 @@ void vehicleDetectionTracking(const string sourcePath, const string outputPath)
 			line(imgFrame2Copy, crossingLine[0], crossingLine[1], SCALAR_RED, 2);
 		drawCarCountOnImage(carCount, imgFrame2Copy);
 		imshow("imgFrame2Copy", imgFrame2Copy);
-
-		//imgCar = imgFrame2Copy.clone();
 		writeVideo << imgFrame2Copy;
 
 		//读取下一帧图像
@@ -172,7 +169,7 @@ void vehicleDetectionTracking(const string sourcePath, const string outputPath)
 		frameCount++;
 		chCheckForEscKey = waitKey(1);
 	}
-	//outfile.close();
+	outfile.close();
 	if (chCheckForEscKey != 27)
 		waitKey(1); 
 }

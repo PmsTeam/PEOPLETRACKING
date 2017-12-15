@@ -112,7 +112,7 @@ void Blob::judgeVehicle(Blob &possibleBlob)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void Blob::judgePeople(Blob &possibleBlob)
 {
-	if (possibleBlob.currentBoundingRect.area() > 800 &&
+	if (possibleBlob.currentBoundingRect.area() > 400 &&
 		possibleBlob.dblCurrentAspectRatio > 0.35 && possibleBlob.dblCurrentAspectRatio < 0.80 &&
 		possibleBlob.currentBoundingRect.width > 20 &&
 		possibleBlob.currentBoundingRect.height > 35 &&

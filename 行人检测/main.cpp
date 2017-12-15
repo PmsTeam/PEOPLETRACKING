@@ -18,7 +18,7 @@ int main(int argc, char* argv[])
 	for (int i = 0; i < sourcePath.size(); i++)
 	{
 		outputPath.push_back(sourcePath[i]);
-		if (sourcePath[i] == '/')
+		if (sourcePath[i] == '/' || sourcePath[i] == '\\' )
 			outputPath.clear();
 		
 	}	
@@ -38,7 +38,6 @@ int main(int argc, char* argv[])
 	if (strcmp(argv[1], "-c") == 0)
 	{
 		//Ö»¼ì²â³µ
-		//string outputPath = "./CarsDrivingUnderBridge.avi";
 		vehicleDetectionTracking(sourcePath, outputPath);
 	}
 	else if (strcmp(argv[1], "-p") == 0)
