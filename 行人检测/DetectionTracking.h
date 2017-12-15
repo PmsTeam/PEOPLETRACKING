@@ -26,6 +26,7 @@ bool checkIfBlobsCrossedTheLine2(vector<Blob> &blobs, int &intHorizontalLinePosi
 void drawBlobInfoOnImage(vector<Blob> &blobs, Mat &imgFrame2Copy);
 void drawCarCountOnImage(int &carCount, Mat &imgFrame2Copy);
 void drawPeopleCountOnImage(int &carCount, Mat &imgFrame2Copy);
+bool checkIfBlobsCrossedTheLine3(vector<Blob> &blobs, int &intHorizontalLinePosition, int &carCount);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 

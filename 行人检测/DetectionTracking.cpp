@@ -1,5 +1,5 @@
 #include "DetectionTracking.h"
-
+double accSpeed = 0;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void matchCurrentFrameBlobsToExistingBlobs(vector<Blob> &existingBlobs, vector<Blob> &currentFrameBlobs) 
 {
@@ -122,10 +122,12 @@ bool checkIfBlobsCrossedTheLine(vector<Blob> &blobs, int &intHorizontalLinePosit
 			int prevFrameIndex = (int)blob.centerPositions.size() - 2;
 			int currFrameIndex = (int)blob.centerPositions.size() - 1;
 
-			if (blob.centerPositions[prevFrameIndex].y > intHorizontalLinePosition
-				&& blob.centerPositions[currFrameIndex].y <= intHorizontalLinePosition)
+			if (blob.centerPositions[prevFrameIndex].x > intHorizontalLinePosition
+				&& blob.centerPositions[currFrameIndex].x <= intHorizontalLinePosition)
 			{
 				carCount++;
+				accSpeed += blob.dblCarSpeed;
+				//cout << accSpeed << endl;
 				blnAtLeastOneBlobCrossedTheLine = true;
 			}
 		}
@@ -146,10 +148,37 @@ bool checkIfBlobsCrossedTheLine2(vector<Blob> &blobs, int &intHorizontalLinePosi
 			int prevFrameIndex = (int)blob.centerPositions.size() - 2;
 			int currFrameIndex = (int)blob.centerPositions.size() - 1;
 
+			if (blob.centerPositions[prevFrameIndex].x > intHorizontalLinePosition
+				&& blob.centerPositions[currFrameIndex].x <= intHorizontalLinePosition)
+			{
+				peopleCount++;
+				accSpeed += blob.dblCarSpeed;
+				blnAtLeastOneBlobCrossedTheLine = true;
+			}
+		}
+	}
+
+	return blnAtLeastOneBlobCrossedTheLine;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+bool checkIfBlobsCrossedTheLine3(vector<Blob> &blobs, int &intHorizontalLinePosition, int &peopleCount)
+{
+	bool blnAtLeastOneBlobCrossedTheLine = false;
+
+	for (auto blob : blobs)
+	{
+		if (blob.blnStillBeingTracked == true && blob.centerPositions.size() >= 2)
+		{
+			int prevFrameIndex = (int)blob.centerPositions.size() - 2;
+			int currFrameIndex = (int)blob.centerPositions.size() - 1;
+
 			if (blob.centerPositions[prevFrameIndex].y > intHorizontalLinePosition
 				&& blob.centerPositions[currFrameIndex].y <= intHorizontalLinePosition)
 			{
 				peopleCount++;
+				accSpeed += blob.dblCarSpeed;
+				//cout << accSpeed << endl;
 				blnAtLeastOneBlobCrossedTheLine = true;
 			}
 		}

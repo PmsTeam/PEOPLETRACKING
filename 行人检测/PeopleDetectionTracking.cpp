@@ -1,5 +1,5 @@
 #include "PeopleDetectionTracking.h"
-
+extern double accSpeed;
 void peopleDetectionTracking(const string videoPath,const string outputPath)
 {
 
@@ -38,10 +38,10 @@ void peopleDetectionTracking(const string videoPath,const string outputPath)
 	//定义计数横线位置
 	Point crossingLine[2];
 	int intHorizontalLinePosition = (int)round((double)imgFrame1.rows * 0.35);
-	crossingLine[0].x = 0;
-	crossingLine[0].y = intHorizontalLinePosition;
-	crossingLine[1].x = imgFrame1.cols - 1;
-	crossingLine[1].y = intHorizontalLinePosition;
+	crossingLine[0].x = imgFrame1.cols * 0.276;
+	crossingLine[0].y = imgFrame1.rows * 0.556;
+	crossingLine[1].x = imgFrame1.cols * 0.674;
+	crossingLine[1].y = imgFrame1.rows * 0.556;
 
 	char chCheckForEscKey = 0;
 	bool blnFirstFrame = true;
@@ -52,6 +52,13 @@ void peopleDetectionTracking(const string videoPath,const string outputPath)
 	vector<Blob> blobs;
 	int out = 0;//每30帧输出一次这段时间内通过的车数
 	ofstream outfile("./cache/out-people.txt");
+
+	//定义文件输出流 
+	ofstream oFile;
+
+	//打开要输出的文件 
+	oFile.open("./cache/行人信息摘要.csv", ios::out | ios::trunc);    // 这样就很容易的输出一个需要的excel 文件
+	oFile << "当前视频时间" << "," << "累计通过行人总数" << "," << "1s内通过行人总数" << "," << "行人通过平均速率" << endl;
 	
 	while (capVideo.isOpened() && chCheckForEscKey != 27)
 	{
@@ -62,17 +69,31 @@ void peopleDetectionTracking(const string videoPath,const string outputPath)
 		if (out++ == 30)
 		{
 			peopleDCount = peopleCount - peopleDCount;
-			outfile << "总人数：";
+			string currentTime = to_string(capVideo.get(CV_CAP_PROP_POS_MSEC) / 1000);
+			string subCurrentTime = currentTime.substr(0, currentTime.size() - 5) + "秒";
+			string avgSpeed;
+			if (peopleDCount != 0)
+				avgSpeed = to_string(accSpeed / peopleDCount);
+			else
+				avgSpeed = to_string(0);
+			string subAvgSpeed = avgSpeed.substr(0, avgSpeed.size() - 5) + "km/h";
+
+			outfile << "REAL-TIME：";
+			outfile << subCurrentTime;
+			outfile << "    ";
+			outfile << "TOTAL-PEOPLE：";
 			outfile << peopleCount;
 			outfile << "    ";
-			outfile << "实时时间: ";
+			outfile << "REAL-TIME: ";
 			outfile << capVideo.get(CV_CAP_PROP_POS_MSEC) / 1000;
 			outfile << "    ";
-			outfile << "实时行人数目: ";
+			outfile << "REAL-PEOPLE: ";
 			outfile << peopleDCount << endl;
+			//结合当前时间，写出到流量报告
+			oFile << subCurrentTime << "," << peopleCount << "," << peopleDCount << "," << subAvgSpeed << endl;
 			peopleDCount = peopleCount;
+			accSpeed = 0;
 			out = 0;
-			//结合当前时间，写出到流量报告，代码未完
 		}
 
 		Mat imgFrame1Copy = imgFrame1.clone();
@@ -144,7 +165,7 @@ void peopleDetectionTracking(const string videoPath,const string outputPath)
 		imgFrame2Copy = imgFrame2.clone();
 		drawBlobInfoOnImage(blobs, imgFrame2Copy);
 
-		bool blnAtLeastOneBlobCrossedTheLine = checkIfBlobsCrossedTheLine(blobs, intHorizontalLinePosition, peopleCount);
+		bool blnAtLeastOneBlobCrossedTheLine = checkIfBlobsCrossedTheLine3(blobs, intHorizontalLinePosition, peopleCount);
 		if (blnAtLeastOneBlobCrossedTheLine == true)
 			line(imgFrame2Copy, crossingLine[0], crossingLine[1], SCALAR_GREEN, 2);
 		else

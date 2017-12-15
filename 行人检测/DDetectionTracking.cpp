@@ -1,4 +1,5 @@
 #include "DDetectionTracking.h"
+extern double accSpeed;
 
 void DDetectionTracking(const string sourcePath, const string outputPath)
 {
@@ -53,17 +54,17 @@ void DDetectionTracking(const string sourcePath, const string outputPath)
 	capVideo.read(imgFrame2);
 
 	//划线函数，用于流量统计用/////////////////////////////////////////
-	int intHorizontalLinePosition = (int)std::round((double)imgFrame1.rows * 0.529);         //车
-	crossingLine[0].x = imgFrame1.cols * 0.085;
-	crossingLine[0].y = imgFrame1.rows * 0.529;
-	crossingLine[1].x = imgFrame1.cols * 0.386;
-	crossingLine[1].y = imgFrame1.rows * 0.529;
+	int intHorizontalLinePosition = (int)std::round((double)imgFrame1.cols * 0.404);         //车
+	crossingLine[0].x = imgFrame1.cols * 0.404;
+	crossingLine[0].y = imgFrame1.rows * 0.250;
+	crossingLine[1].x = imgFrame1.cols * 0.404;
+	crossingLine[1].y = imgFrame1.rows * 0.572;
 
-	int intHorizontalLinePosition2 = (int)std::round((double)imgFrame1.rows * 0.296);    //人
-	crossingLine2[1].x = imgFrame1.cols * 0.320;
-	crossingLine2[1].y = imgFrame1.rows * 0.296;
-	crossingLine2[0].x = imgFrame1.cols;
-	crossingLine2[0].y = imgFrame1.rows * 0.296;
+	int intHorizontalLinePosition2 = (int)std::round((double)imgFrame1.cols * 0.319);    //人
+	crossingLine2[1].x = imgFrame1.cols * 0.319;
+	crossingLine2[1].y = imgFrame1.rows * 0.628;
+	crossingLine2[0].x = imgFrame1.cols * 0.319;
+	crossingLine2[0].y = imgFrame1.rows * 0.842;
 	///////////////////////////////////////////////////////////////////
 
 	char chCheckForEscKey = 0;
@@ -75,30 +76,32 @@ void DDetectionTracking(const string sourcePath, const string outputPath)
 	int out = 0;//每30帧输出一次这段时间内通过的车数
 	ofstream outfile("./cache/out-Double.txt");
 
+
 	while (capVideo.isOpened() && chCheckForEscKey != 27) {     //capVideo.isOpende()判断视频读取或者摄像头调用是否成功，成功则返回true。
 
 
 		if (out++ == 30)
 		{
 			peopleDCount = peopleCount - peopleDCount;
-			outfile << "总人数：";
+
+			outfile << "TOTAL-PEOPLE：";
 			outfile << peopleCount;
 			outfile << "    ";
-			outfile << "实时时间: ";
+			outfile << "REAL-TIME: ";
 			outfile << capVideo.get(CV_CAP_PROP_POS_MSEC) / 1000;
 			outfile << "    ";
-			outfile << "实时行人数目: ";
+			outfile << "REAL-PEOPLE: ";
 			outfile << peopleDCount << endl;
 			peopleDCount = peopleCount;
 
 			carDCount = carCount - carDCount;
-			outfile << "总车数：";
+			outfile << "TOTAL-CAR：";
 			outfile << carCount;
 			outfile << "    ";
-			outfile << "实时时间: ";
+			outfile << "REAL-TIME: ";
 			outfile << capVideo.get(CV_CAP_PROP_POS_MSEC) / 1000;
 			outfile << "    ";
-			outfile << "实时车数目: ";
+			outfile << "REAL-CAR: ";
 			outfile << carDCount << endl;
 			carDCount = carCount;
 			out = 0;
@@ -167,8 +170,8 @@ void DDetectionTracking(const string sourcePath, const string outputPath)
 
 		for (auto &convexHull : convexHulls) {
 			Blob possibleBlob(convexHull);
-			possibleBlob.judgePeople(possibleBlob);
-			possibleBlob.judgeVehicle(possibleBlob);
+			possibleBlob.DjudgePeople(possibleBlob);
+			possibleBlob.DjudgeVehicle(possibleBlob);
 			if (possibleBlob.blnIsPeople || possibleBlob.blnIsVehicle)
 				currentFrameBlobs.push_back(possibleBlob);
 			}
@@ -230,3 +233,4 @@ void DDetectionTracking(const string sourcePath, const string outputPath)
 	}
 
 }
+

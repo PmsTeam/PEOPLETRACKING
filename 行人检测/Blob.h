@@ -32,6 +32,8 @@ public:
     void predictNextPosition(void);//预测团块的下一个位置
 	void judgeVehicle(Blob &possibleBlob);//判断是否为车辆
 	void judgePeople(Blob &possibleBlob);//判断是否为行人
+	void DjudgeVehicle(Blob &possibleBlob);//判断是否为车辆
+	void DjudgePeople(Blob &possibleBlob);//判断是否为行人
 	/*------------------------------Beta新增--------------------------------*/
 	void evaluateSpeed();//估测速率
 	//vector<double> currentTime;//时间戳
