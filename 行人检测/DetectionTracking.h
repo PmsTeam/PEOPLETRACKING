@@ -22,6 +22,7 @@ double distanceBetweenPoints(Point point1, Point point2);
 void drawAndShowContours(Size imageSize, vector<vector<Point> > contours, string strImageName);
 void drawAndShowContours(Size imageSize, vector<Blob> blobs, string strImageName);
 bool checkIfBlobsCrossedTheLine(vector<Blob> &blobs, int &intHorizontalLinePosition, int &carCount);
+bool checkIfBlobsCrossedTheLine2(vector<Blob> &blobs, int &intHorizontalLinePosition, int &peopleCount);
 void drawBlobInfoOnImage(vector<Blob> &blobs, Mat &imgFrame2Copy);
 void drawCarCountOnImage(int &carCount, Mat &imgFrame2Copy);
 void drawPeopleCountOnImage(int &carCount, Mat &imgFrame2Copy);

@@ -135,6 +135,30 @@ bool checkIfBlobsCrossedTheLine(vector<Blob> &blobs, int &intHorizontalLinePosit
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+bool checkIfBlobsCrossedTheLine2(vector<Blob> &blobs, int &intHorizontalLinePosition, int &peopleCount)
+{
+	bool blnAtLeastOneBlobCrossedTheLine = false;
+
+	for (auto blob : blobs)
+	{
+		if (blob.blnStillBeingTracked == true && blob.centerPositions.size() >= 2)
+		{
+			int prevFrameIndex = (int)blob.centerPositions.size() - 2;
+			int currFrameIndex = (int)blob.centerPositions.size() - 1;
+
+			if (blob.centerPositions[prevFrameIndex].y > intHorizontalLinePosition
+				&& blob.centerPositions[currFrameIndex].y <= intHorizontalLinePosition)
+			{
+				peopleCount++;
+				blnAtLeastOneBlobCrossedTheLine = true;
+			}
+		}
+	}
+
+	return blnAtLeastOneBlobCrossedTheLine;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 void drawBlobInfoOnImage(vector<Blob> &blobs, Mat &imgFrame2Copy) 
 {
 	for (unsigned int i = 0; i < blobs.size(); i++) 
@@ -184,7 +208,7 @@ void drawPeopleCountOnImage(int &peopleCount, Mat &imgFrame2Copy) {
 
 	Point ptTextBottomLeftPosition;
 
-	ptTextBottomLeftPosition.x = imgFrame2Copy.cols - 1 - (int)((double)textSize.width * 1.25);
+	ptTextBottomLeftPosition.x = (int)((double)textSize.width * 1.25);
 	ptTextBottomLeftPosition.y = (int)((double)textSize.height * 1.25);
 
 	putText(imgFrame2Copy, to_string(peopleCount), ptTextBottomLeftPosition, intFontFace, dblFontScale, SCALAR_GREEN, intFontThickness);

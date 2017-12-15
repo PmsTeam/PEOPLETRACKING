@@ -6,6 +6,7 @@
 #include "DetectionTracking.h"
 #include "VehicleDetectionTracking.h"
 #include "PeopleDetectionTracking.h"
+#include "DDetectionTracking.h"
 //#include "Detector.h"
 using namespace std;
 using namespace cv;
@@ -47,7 +48,8 @@ int main(int argc, char* argv[])
 	}
 	else if (strcmp(argv[1], "-d") == 0)
 	{
-		//人车同时检测（可能需要再写一个头文件和源文件，需要测试一下）
+		DDetectionTracking(sourcePath, outputPath);
+		//人车同时检测
 	}
 	else
 	{

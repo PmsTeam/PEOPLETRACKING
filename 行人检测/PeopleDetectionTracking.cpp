@@ -29,8 +29,6 @@ void peopleDetectionTracking(const string videoPath,const string outputPath)
 		(int)capVideo.get(CV_CAP_PROP_FRAME_HEIGHT)), // 视频大小
 		true); // 是否输出彩色视频
 
-	
-
 
 	Mat imgFrame1;
 	Mat imgFrame2;
@@ -65,7 +63,7 @@ void peopleDetectionTracking(const string videoPath,const string outputPath)
 		{
 			peopleDCount = peopleCount - peopleDCount;
 			outfile << "总人数：";
-			outfile << peopleDCount;
+			outfile << peopleCount;
 			outfile << "    ";
 			outfile << "实时时间: ";
 			outfile << capVideo.get(CV_CAP_PROP_POS_MSEC) / 1000;
