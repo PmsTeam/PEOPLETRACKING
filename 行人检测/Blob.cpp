@@ -112,24 +112,24 @@ void Blob::judgeVehicle(Blob &possibleBlob)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void Blob::judgePeople(Blob &possibleBlob)
 {
-	if (possibleBlob.currentBoundingRect.area() > 800 &&
-		possibleBlob.dblCurrentAspectRatio > 0.35 && possibleBlob.dblCurrentAspectRatio < 0.80 &&
-		possibleBlob.currentBoundingRect.width > 20 &&
-		possibleBlob.currentBoundingRect.height > 35 &&
-		possibleBlob.dblCurrentDiagonalSize > 35 &&
-		(contourArea(possibleBlob.currentContour) / (double)possibleBlob.currentBoundingRect.area()) > 0.30)
+	if (possibleBlob.currentBoundingRect.area() > 4000 &&
+		possibleBlob.dblCurrentAspectRatio > 0.40 && possibleBlob.dblCurrentAspectRatio < 0.65 &&
+		possibleBlob.currentBoundingRect.width > 35 &&
+		possibleBlob.currentBoundingRect.height > 85 &&
+		possibleBlob.dblCurrentDiagonalSize > 85 &&
+		(contourArea(possibleBlob.currentContour) / (double)possibleBlob.currentBoundingRect.area()) > 0.50)
 		possibleBlob.blnIsPeople = true;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void Blob::DjudgeVehicle(Blob &possibleBlob)
 {
-	if (possibleBlob.currentBoundingRect.area() > 7000 &&
-		possibleBlob.dblCurrentAspectRatio > 1.5 &&
+	if (possibleBlob.currentBoundingRect.area() > 9000 &&
+		possibleBlob.dblCurrentAspectRatio > 1.1 &&
 		possibleBlob.dblCurrentAspectRatio < 3.0 &&
-		possibleBlob.currentBoundingRect.width > 95 &&
-		possibleBlob.currentBoundingRect.height > 50 &&
-		possibleBlob.dblCurrentDiagonalSize > 95 &&
+		possibleBlob.currentBoundingRect.width > 170 &&
+		possibleBlob.currentBoundingRect.height > 90 &&
+		possibleBlob.dblCurrentDiagonalSize > 170 &&
 		(contourArea(possibleBlob.currentContour) / (double)possibleBlob.currentBoundingRect.area()) > 0.30)
 		possibleBlob.blnIsVehicle = true;
 }
@@ -137,11 +137,11 @@ void Blob::DjudgeVehicle(Blob &possibleBlob)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void Blob::DjudgePeople(Blob &possibleBlob)
 {
-	if (possibleBlob.currentBoundingRect.area() > 1000 &&
-		possibleBlob.dblCurrentAspectRatio > 0.30 && possibleBlob.dblCurrentAspectRatio < 0.70 &&
-		possibleBlob.currentBoundingRect.width > 20 &&
-		possibleBlob.currentBoundingRect.height > 55 &&
-		possibleBlob.dblCurrentDiagonalSize > 55 &&
+	if (possibleBlob.currentBoundingRect.area() > 300 &&
+		possibleBlob.dblCurrentAspectRatio > 0.30 && possibleBlob.dblCurrentAspectRatio < 0.90 &&
+		possibleBlob.currentBoundingRect.width > 30 &&
+		possibleBlob.currentBoundingRect.height > 100 &&
+		possibleBlob.dblCurrentDiagonalSize > 100 &&
 		(contourArea(possibleBlob.currentContour) / (double)possibleBlob.currentBoundingRect.area()) > 0.30)
 		possibleBlob.blnIsPeople = true;
 }

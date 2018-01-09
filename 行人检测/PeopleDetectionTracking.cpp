@@ -38,7 +38,7 @@ void peopleDetectionTracking(const string videoPath,const string outputPath)
 	//定义计数横线位置
 	Point crossingLine[2];
 	int intHorizontalLinePosition = (int)round((double)imgFrame1.rows * 0.534);
-	crossingLine[0].x = imgFrame1.cols * 0.405;
+	crossingLine[0].x = imgFrame1.cols * 0.215;
 	crossingLine[0].y = imgFrame1.rows * 0.534;
 	crossingLine[1].x = imgFrame1.cols * 0.980;
 	crossingLine[1].y = imgFrame1.rows * 0.534;

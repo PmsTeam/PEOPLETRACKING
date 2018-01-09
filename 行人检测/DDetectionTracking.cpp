@@ -57,17 +57,17 @@ void DDetectionTracking(const string sourcePath, const string outputPath)
 	capVideo.read(imgFrame2);
 
 	//划线函数，用于流量统计用/////////////////////////////////////////
-	int intHorizontalLinePosition = (int)std::round((double)imgFrame1.cols * 0.404);         //车
-	crossingLine[0].x = imgFrame1.cols * 0.404;
-	crossingLine[0].y = imgFrame1.rows * 0.250;
-	crossingLine[1].x = imgFrame1.cols * 0.404;
-	crossingLine[1].y = imgFrame1.rows * 0.572;
+	int intHorizontalLinePosition = (int)std::round((double)imgFrame1.cols * 0.791);         //车
+	crossingLine[0].x = imgFrame1.cols * 0.791;
+	crossingLine[0].y = 0 ;
+	crossingLine[1].x = imgFrame1.cols * 0.791;
+	crossingLine[1].y = imgFrame1.rows * 0.591;
 
-	int intHorizontalLinePosition2 = (int)std::round((double)imgFrame1.cols * 0.319);    //人
-	crossingLine2[1].x = imgFrame1.cols * 0.319;
-	crossingLine2[1].y = imgFrame1.rows * 0.628;
-	crossingLine2[0].x = imgFrame1.cols * 0.319;
-	crossingLine2[0].y = imgFrame1.rows * 0.842;
+	int intHorizontalLinePosition2 = (int)std::round((double)imgFrame1.cols * 0.550);    //人
+	crossingLine2[1].x = imgFrame1.cols * 0.550;
+	crossingLine2[1].y = imgFrame1.rows * 0.683;
+	crossingLine2[0].x = imgFrame1.cols * 0.550;
+	crossingLine2[0].y = imgFrame1.rows ;
 	///////////////////////////////////////////////////////////////////
 
 	char chCheckForEscKey = 0;
