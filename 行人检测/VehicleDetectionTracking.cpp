@@ -36,7 +36,7 @@ void vehicleDetectionTracking(const string sourcePath, const string outputPath)
 
 											//打开要输出的文件 
 	oFile.open("./cache//Digest-Car.csv", ios::out | ios::trunc);
-	oFile << "当前视频时间" << "," << "累计通过车辆总数" << "," << "1s内通过车辆总数" << "," << "车辆通过平均速率" << endl;
+	oFile << "当前视频时间" << "," << "累计通过车辆总数" << "," << "1s内通过车辆总数" << "," << "车辆通过平均速率(km/h)" << endl;
 
 	//读取连续的两帧
 	Mat imgFrame1;
@@ -73,7 +73,7 @@ void vehicleDetectionTracking(const string sourcePath, const string outputPath)
 				avgSpeed = to_string(accSpeed / carDCount);
 			else
 				avgSpeed = to_string(0);
-			string subAvgSpeed = avgSpeed.substr(0, avgSpeed.size() - 5) + "km/h";
+			string subAvgSpeed = avgSpeed.substr(0, avgSpeed.size() - 5);
 
 			//结合当前时间，写出到流量报告
 			oFile << subCurrentTime << "," << carCount << "," << carDCount << "," << subAvgSpeed << endl;

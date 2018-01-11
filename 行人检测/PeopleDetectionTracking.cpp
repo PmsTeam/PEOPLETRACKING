@@ -22,7 +22,7 @@ void peopleDetectionTracking(const string videoPath,const string outputPath)
 
 	//打开输出视频
 	VideoWriter writeVideo;
-	writeVideo.open(outputPath, // 输出视频文件名
+	writeVideo.open(outputPath, // 输出视频文件名6
 		(int)capVideo.get(CV_FOURCC_PROMPT), // 也可设为CV_FOURCC_PROMPT，在运行时选取
 		(double)capVideo.get(CV_CAP_PROP_FPS), // 视频帧率
 		Size((int)capVideo.get(CV_CAP_PROP_FRAME_WIDTH),
@@ -38,7 +38,7 @@ void peopleDetectionTracking(const string videoPath,const string outputPath)
 	//定义计数横线位置
 	Point crossingLine[2];
 	int intHorizontalLinePosition = (int)round((double)imgFrame1.rows * 0.534);
-	crossingLine[0].x = imgFrame1.cols * 0.215;
+	crossingLine[0].x = imgFrame1.cols * 0.405;
 	crossingLine[0].y = imgFrame1.rows * 0.534;
 	crossingLine[1].x = imgFrame1.cols * 0.980;
 	crossingLine[1].y = imgFrame1.rows * 0.534;
@@ -76,7 +76,7 @@ void peopleDetectionTracking(const string videoPath,const string outputPath)
 				avgSpeed = to_string(accSpeed / peopleDCount);
 			else
 				avgSpeed = to_string(0);
-			string subAvgSpeed = avgSpeed.substr(0, avgSpeed.size() - 5) + "km/h";
+			string subAvgSpeed = avgSpeed.substr(0, avgSpeed.size() - 5);
 
 			outfile << "REAL-TIME：";
 			outfile << subCurrentTime;
@@ -163,7 +163,7 @@ void peopleDetectionTracking(const string videoPath,const string outputPath)
 
 		// get another copy of frame 2 since we changed the previous frame 2 copy in the processing above
 		imgFrame2Copy = imgFrame2.clone();
-		drawBlobInfoOnImage(blobs, imgFrame2Copy);
+		drawBlobInfoOnImage1(blobs, imgFrame2Copy);
 
 		bool blnAtLeastOneBlobCrossedTheLine = checkIfBlobsCrossedTheLine3(blobs, intHorizontalLinePosition, peopleCount);
 		if (blnAtLeastOneBlobCrossedTheLine == true)

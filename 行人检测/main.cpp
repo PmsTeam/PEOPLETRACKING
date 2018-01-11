@@ -32,7 +32,6 @@ int main(int argc, char* argv[])
 		}
 		outputPath.pop_back();
 		outputPath = "./cache/" + outputPath + "-out.avi";
-		cout << outputPath << endl;
 		break;
 	}
 	

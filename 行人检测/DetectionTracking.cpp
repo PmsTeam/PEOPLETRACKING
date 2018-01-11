@@ -122,8 +122,8 @@ bool checkIfBlobsCrossedTheLine(vector<Blob> &blobs, int &intHorizontalLinePosit
 			int prevFrameIndex = (int)blob.centerPositions.size() - 2;
 			int currFrameIndex = (int)blob.centerPositions.size() - 1;
 
-			if (blob.centerPositions[prevFrameIndex].x > intHorizontalLinePosition
-				&& blob.centerPositions[currFrameIndex].x <= intHorizontalLinePosition)
+			if (blob.centerPositions[prevFrameIndex].y > intHorizontalLinePosition
+				&& blob.centerPositions[currFrameIndex].y <= intHorizontalLinePosition)
 			{
 				carCount++;
 				accSpeed += blob.dblCarSpeed;
@@ -205,6 +205,28 @@ void drawBlobInfoOnImage(vector<Blob> &blobs, Mat &imgFrame2Copy)
 			string strSpeed = to_string(blobs[i].dblCarSpeed);
 			string subString = strSpeed.substr(0, strSpeed.size() - 5) + "km/h";
 			putText(imgFrame2Copy, subString, blobs[i].centerPositions.back(), intFontFace, dblFontScale, SCALAR_GREEN, intFontThickness);
+		}
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+void drawBlobInfoOnImage1(vector<Blob> &blobs, Mat &imgFrame2Copy)
+{
+	for (unsigned int i = 0; i < blobs.size(); i++)
+	{
+		if (blobs[i].blnStillBeingTracked == true)
+		{
+			rectangle(imgFrame2Copy, blobs[i].currentBoundingRect, SCALAR_RED, 2);
+
+			int intFontFace = CV_FONT_HERSHEY_SIMPLEX;
+			double dblFontScale = blobs[i].dblCurrentDiagonalSize / 120.0;
+			int intFontThickness = (int)round(dblFontScale * 2.0);
+
+			//putText(imgFrame2Copy, to_string(i), blobs[i].centerPositions.back(), intFontFace, dblFontScale, SCALAR_GREEN, intFontThickness);
+
+			string strSpeed = to_string(blobs[i].dblCarSpeed);
+			string subString = strSpeed.substr(0, strSpeed.size() - 5) + " ";
+			//putText(imgFrame2Copy, subString, blobs[i].centerPositions.back(), intFontFace, dblFontScale, SCALAR_GREEN, intFontThickness);
 		}
 	}
 }
